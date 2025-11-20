@@ -1,0 +1,55 @@
+# OCI Authentication
+tenancy_ocid     = "ocid1.tenancy.oc1..aaaaaaaa..."
+user_ocid        = "ocid1.user.oc1..aaaaaaaa..."
+fingerprint      = "aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99"
+private_key_path = "~/.oci/oci_api_key.pem"
+region           = "us-ashburn-1"
+
+# Compartment
+compartment_ocid = "ocid1.compartment.oc1..aaaaaaaa..."
+
+# SSH Configuration (optional - will auto-generate if not provided)
+# ssh_public_key       = "ssh-rsa AAAAB3NzaC1yc2E..."
+# ssh_private_key_path = "~/.ssh/elasticsearch_cluster_key.pem"
+
+# Elasticsearch Configuration
+elasticsearch_version      = "8"  # Choose "7" or "8"
+elasticsearch_cluster_name = "oci-es-cluster"
+
+# Node Configuration
+master_node_count = 3  # Must be odd number (1, 3, 5, etc.)
+data_node_count   = 3  # Can be any number >= 1
+
+# Compute Shapes - Master Nodes (with Kibana)
+master_node_shape     = "VM.Standard.E5.Flex"
+master_node_ocpus     = 2
+master_node_memory_gb = 16
+
+# Compute Shapes - Data Nodes
+data_node_shape     = "VM.Standard.E5.Flex"
+data_node_ocpus     = 4
+data_node_memory_gb = 32
+
+# Bastion Host
+bastion_shape     = "VM.Standard.E5.Flex"
+bastion_ocpus     = 1
+bastion_memory_gb = 4
+
+# Storage
+boot_volume_size_gb = 100
+data_volume_size_gb = 500  # Size of block volume for each data node
+
+# Network (optional - defaults are fine for most cases)
+# vcn_cidr              = "10.0.0.0/16"
+# bastion_subnet_cidr   = "10.0.1.0/24"
+# lb_subnet_cidr        = "10.0.2.0/24"
+# private_subnet_cidrs  = ["10.0.10.0/24", "10.0.11.0/24", "10.0.12.0/24"]
+
+# Load Balancer
+lb_shape              = "flexible"
+lb_min_bandwidth_mbps = 10
+lb_max_bandwidth_mbps = 100
+
+# Tags
+project_tag = "elasticsearch-cluster"
+

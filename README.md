@@ -11,18 +11,6 @@ This Terraform configuration deploys a production-ready Elasticsearch cluster on
 - **Multi-AD Deployment**: Nodes distributed across availability domains for high availability
 - **Network Security Groups**: Modern security using NSGs instead of security lists
 
-## Features
-
-- ✅ **Elasticsearch Version Selection**: Choose between Elasticsearch 7.x or 8.x
-- ✅ **Security Enabled by Default**: Automatic TLS certificate generation and password setup
-- ✅ **Configurable Node Count**: Adjust master and data node counts
-- ✅ **Flexible Compute Shapes**: Use OCI Flex shapes with configurable OCPUs and memory
-- ✅ **Automated Installation**: Uses official Elastic repositories (no tarballs)
-- ✅ **Block Volume Storage**: Dedicated storage for data nodes with automatic mounting
-- ✅ **Load Balancer**: Configured with health checks for both Elasticsearch and Kibana
-- ✅ **Firewall Configuration**: Automatically opens required ports
-- ✅ **Auto-scaling Ready**: Easy to add more nodes by changing variables
-
 ## Prerequisites
 
 1. **OCI Account** with appropriate permissions to create:

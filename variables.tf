@@ -231,3 +231,17 @@ variable "project_tag" {
   default     = "elasticsearch-cluster"
 }
 
+# OCI Object Storage for Snapshots (Optional)
+variable "oci_object_storage_access_key" {
+  description = "OCI Object Storage access key for snapshots (optional - leave empty to configure manually later)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "oci_object_storage_secret_key" {
+  description = "OCI Object Storage secret key for snapshots (optional - leave empty to configure manually later)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

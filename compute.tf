@@ -66,6 +66,8 @@ resource "oci_core_instance" "master" {
       elasticsearch_port           = var.elasticsearch_port
       elasticsearch_transport_port = var.elasticsearch_transport_port
       kibana_port                  = var.kibana_port
+      oci_storage_access_key       = var.oci_object_storage_access_key
+      oci_storage_secret_key       = var.oci_object_storage_secret_key
     }))
   }
 

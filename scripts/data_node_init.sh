@@ -187,6 +187,12 @@ cat > /etc/systemd/system/elasticsearch.service.d/override.conf <<EOF
 LimitMEMLOCK=infinity
 EOF
 
+# Remove auto-generated HTTP SSL configuration that conflicts with our settings
+# Elasticsearch auto-generates xpack.security.http.ssl settings on first install
+# We need to remove these before starting to avoid conflicts
+echo "Removing auto-generated HTTP SSL configuration..."
+sed -i '/^xpack\.security\.http\.ssl:/,/^  keystore\.path:/d' /etc/elasticsearch/elasticsearch.yml
+
 # Configure firewall
 echo "Configuring firewall..."
 firewall-cmd --permanent --add-port=$${ES_PORT}/tcp

@@ -14,6 +14,8 @@ HEAP_SIZE="${heap_size_gb}g"
 ES_PORT="${elasticsearch_port}"
 ES_TRANSPORT_PORT="${elasticsearch_transport_port}"
 KIBANA_PORT="${kibana_port}"
+OCI_STORAGE_ACCESS_KEY="${oci_storage_access_key}"
+OCI_STORAGE_SECRET_KEY="${oci_storage_secret_key}"
 
 # Retry function with exponential backoff
 retry_command() {
@@ -106,6 +108,11 @@ EOF
 echo "Installing Elasticsearch and Kibana..."
 retry_command dnf install -y elasticsearch kibana
 
+# Install repository-s3 plugin for snapshot support
+echo "Installing repository-s3 plugin for OCI Object Storage snapshots..."
+/usr/share/elasticsearch/bin/elasticsearch-plugin install --batch repository-s3
+echo "Repository-s3 plugin installed successfully"
+
 # Create data directories
 echo "Creating data directories..."
 mkdir -p /elasticsearch/data /elasticsearch/logs
@@ -123,6 +130,24 @@ echo "Local IP: $LOCAL_IP"
 echo "Resetting Elasticsearch keystore..."
 rm -f /etc/elasticsearch/elasticsearch.keystore
 /usr/share/elasticsearch/bin/elasticsearch-keystore create
+chown elasticsearch:elasticsearch /etc/elasticsearch/elasticsearch.keystore
+chmod 660 /etc/elasticsearch/elasticsearch.keystore
+
+# Temporarily grant write permissions to /etc/elasticsearch for keystore operations
+chmod 775 /etc/elasticsearch
+
+# Add OCI Object Storage credentials to keystore if provided
+if [ -n "$OCI_STORAGE_ACCESS_KEY" ] && [ -n "$OCI_STORAGE_SECRET_KEY" ]; then
+  echo "Adding OCI Object Storage credentials to keystore..."
+  echo "$OCI_STORAGE_ACCESS_KEY" | sudo -u elasticsearch /usr/share/elasticsearch/bin/elasticsearch-keystore add --stdin s3.client.default.access_key
+  echo "$OCI_STORAGE_SECRET_KEY" | sudo -u elasticsearch /usr/share/elasticsearch/bin/elasticsearch-keystore add --stdin s3.client.default.secret_key
+  echo "OCI Object Storage credentials added to keystore"
+else
+  echo "No OCI Object Storage credentials provided - keystore ready for manual configuration"
+fi
+
+# Restore proper permissions to /etc/elasticsearch
+chmod 750 /etc/elasticsearch
 
 # Configure Elasticsearch
 echo "Configuring Elasticsearch..."
@@ -165,6 +190,12 @@ server.host: "$${LOCAL_IP}"
 server.port: $${KIBANA_PORT}
 elasticsearch.hosts: ["http://$${LOCAL_IP}:$${ES_PORT}"]
 EOF
+
+# Remove auto-generated HTTP SSL configuration that conflicts with our settings
+# Elasticsearch auto-generates xpack.security.http.ssl settings on first install
+# We need to remove these before starting to avoid conflicts
+echo "Removing auto-generated HTTP SSL configuration..."
+sed -i '/^xpack\.security\.http\.ssl:/,/^  keystore\.path:/d' /etc/elasticsearch/elasticsearch.yml
 
 # Configure firewall
 echo "Configuring firewall..."

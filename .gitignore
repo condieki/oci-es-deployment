@@ -16,6 +16,7 @@ override.tf.json
 *.pem
 *.pub
 id_rsa*
+generated_ssh_key.pem
 
 # OS files
 .DS_Store

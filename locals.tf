@@ -10,8 +10,15 @@ locals {
   master_heap_size_gb = min(floor(var.master_node_memory_gb / 2), 31)
   data_heap_size_gb   = min(floor(var.data_node_memory_gb / 2), 31)
 
-  ssh_public_key = var.ssh_public_key != "" ? var.ssh_public_key : tls_private_key.ssh_key[0].public_key_openssh
-  ssh_private_key = var.ssh_public_key != "" ? file(var.ssh_private_key_path) : tls_private_key.ssh_key[0].private_key_pem
+  ssh_public_key = var.ssh_public_key != "" ? var.ssh_public_key : (
+    var.ssh_private_key_path != "" ? file("${var.ssh_private_key_path}.pub") : tls_private_key.ssh_key[0].public_key_openssh
+  )
+
+  ssh_private_key = var.ssh_private_key_path != "" ? file(var.ssh_private_key_path) : tls_private_key.ssh_key[0].private_key_pem
+
+  ssh_private_key_path = var.ssh_private_key_path != "" ? var.ssh_private_key_path : (
+    length(local_file.ssh_private_key) > 0 ? local_file.ssh_private_key[0].filename : ""
+  )
 
   master_node_ads = [
     for i in range(var.master_node_count) :

@@ -57,7 +57,7 @@ data_node_count       = 3    # Any number >= 1
 ```bash
 terraform init
 terraform plan
-terraform apply
+terraform apply -auto-approve
 ```
 
 Deployment takes approximately 10-15 minutes.
@@ -278,7 +278,7 @@ data_node_count = 5  # Increase from 3 to 5
 
 Then run:
 ```bash
-terraform apply
+terraform apply -auto-approve
 ```
 
 ### Add More Master Nodes
@@ -289,7 +289,7 @@ master_node_count = 5  # Must be odd number
 
 Then run:
 ```bash
-terraform apply
+terraform apply -auto-approve
 ```
 
 ## Cleanup

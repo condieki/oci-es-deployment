@@ -8,10 +8,6 @@ region           = "us-ashburn-1"
 # Compartment
 compartment_ocid = "ocid1.compartment.oc1..aaaaaaaa..."
 
-# SSH Configuration (optional - will auto-generate if not provided)
-# ssh_public_key       = "ssh-rsa AAAAB3NzaC1yc2E..."
-# ssh_private_key_path = "~/.ssh/elasticsearch_cluster_key.pem"
-
 # Elasticsearch Configuration
 elasticsearch_version      = "8"  # Choose "7" or "8"
 elasticsearch_cluster_name = "oci-es-cluster"

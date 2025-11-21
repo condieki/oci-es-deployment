@@ -209,8 +209,8 @@ resource "null_resource" "download_certificate" {
   provisioner "local-exec" {
     command = <<-EOT
       scp -o StrictHostKeyChecking=no \
-        -o ProxyCommand="ssh -o StrictHostKeyChecking=no -i ${var.ssh_private_key_path} -W %h:%p opc@${oci_core_instance.bastion.public_ip}" \
-        -i ${var.ssh_private_key_path} \
+        -o ProxyCommand="ssh -o StrictHostKeyChecking=no -i ${local.ssh_private_key_path} -W %h:%p opc@${oci_core_instance.bastion.public_ip}" \
+        -i ${local.ssh_private_key_path} \
         opc@${oci_core_instance.master[0].private_ip}:/tmp/elastic-certificates.p12 \
         /tmp/elastic-certificates.p12
     EOT
@@ -511,21 +511,21 @@ resource "null_resource" "display_credentials" {
     command = <<-EOT
       echo ""
       echo "========================================="
-      echo "✅ ELASTICSEARCH CLUSTER DEPLOYED!"
+      echo "ELASTICSEARCH CLUSTER DEPLOYED!"
       echo "========================================="
       echo ""
-      echo "🔐 Retrieving credentials..."
+      echo "Retrieving credentials..."
       echo ""
-      ELASTIC_PASSWORD=$(ssh -o StrictHostKeyChecking=no -i ${var.ssh_private_key_path} -J opc@${oci_core_instance.bastion.public_ip} opc@${oci_core_instance.master[0].private_ip} 'sudo cat /tmp/elastic_password.txt' 2>/dev/null)
-      KIBANA_PASSWORD=$(ssh -o StrictHostKeyChecking=no -i ${var.ssh_private_key_path} -J opc@${oci_core_instance.bastion.public_ip} opc@${oci_core_instance.master[0].private_ip} 'sudo cat /tmp/kibana_password.txt' 2>/dev/null)
+      ELASTIC_PASSWORD=$(ssh -o StrictHostKeyChecking=no -i ${local.ssh_private_key_path} -o ProxyCommand="ssh -o StrictHostKeyChecking=no -i ${local.ssh_private_key_path} -W %h:%p opc@${oci_core_instance.bastion.public_ip}" opc@${oci_core_instance.master[0].private_ip} 'sudo cat /tmp/elastic_password.txt' 2>/dev/null)
+      KIBANA_PASSWORD=$(ssh -o StrictHostKeyChecking=no -i ${local.ssh_private_key_path} -o ProxyCommand="ssh -o StrictHostKeyChecking=no -i ${local.ssh_private_key_path} -W %h:%p opc@${oci_core_instance.bastion.public_ip}" opc@${oci_core_instance.master[0].private_ip} 'sudo cat /tmp/kibana_password.txt' 2>/dev/null)
       echo "Username: elastic"
       echo "Password: $ELASTIC_PASSWORD"
       echo ""
-      echo "🌐 Access URLs:"
+      echo "Access URLs:"
       echo "   Elasticsearch: http://${oci_load_balancer_load_balancer.elasticsearch_lb.ip_address_details[0].ip_address}:9200"
       echo "   Kibana: http://${oci_load_balancer_load_balancer.elasticsearch_lb.ip_address_details[0].ip_address}:5601"
       echo ""
-      echo "📝 Test command:"
+      echo "Test command:"
       echo "   curl -u elastic:$ELASTIC_PASSWORD http://${oci_load_balancer_load_balancer.elasticsearch_lb.ip_address_details[0].ip_address}:9200/_cluster/health?pretty"
       echo ""
       echo "========================================="

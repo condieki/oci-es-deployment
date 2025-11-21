@@ -30,17 +30,17 @@ output "data_node_private_ips" {
 
 output "ssh_to_bastion" {
   description = "Command to SSH to bastion host"
-  value       = "ssh -i <your-private-key> opc@${oci_core_instance.bastion.public_ip}"
+  value       = "ssh -i ${local.ssh_private_key_path} opc@${oci_core_instance.bastion.public_ip}"
 }
 
 output "ssh_to_master_node" {
   description = "Example command to SSH to a master node via bastion"
-  value       = length(oci_core_instance.master) > 0 ? "ssh -i <your-private-key> -J opc@${oci_core_instance.bastion.public_ip} opc@${oci_core_instance.master[0].private_ip}" : "No master nodes"
+  value       = length(oci_core_instance.master) > 0 ? "ssh -i ${local.ssh_private_key_path} -o StrictHostKeyChecking=no -o ProxyCommand='ssh -i ${local.ssh_private_key_path} -o StrictHostKeyChecking=no -W %h:%p opc@${oci_core_instance.bastion.public_ip}' opc@${oci_core_instance.master[0].private_ip}" : "No master nodes"
 }
 
 output "ssh_to_data_node" {
   description = "Example command to SSH to a data node via bastion"
-  value       = length(oci_core_instance.data) > 0 ? "ssh -i <your-private-key> -J opc@${oci_core_instance.bastion.public_ip} opc@${oci_core_instance.data[0].private_ip}" : "No data nodes"
+  value       = length(oci_core_instance.data) > 0 ? "ssh -i ${local.ssh_private_key_path} -o StrictHostKeyChecking=no -o ProxyCommand='ssh -i ${local.ssh_private_key_path} -o StrictHostKeyChecking=no -W %h:%p opc@${oci_core_instance.bastion.public_ip}' opc@${oci_core_instance.data[0].private_ip}" : "No data nodes"
 }
 
 output "cluster_health_check" {
@@ -50,7 +50,7 @@ output "cluster_health_check" {
 
 output "get_elasticsearch_password" {
   description = "Command to retrieve the Elasticsearch 'elastic' user password"
-  value       = "ssh -i ${var.ssh_private_key_path} -J opc@${oci_core_instance.bastion.public_ip} opc@${oci_core_instance.master[0].private_ip} 'sudo cat /tmp/elastic_password.txt'"
+  value       = "ssh -i ${local.ssh_private_key_path} -o StrictHostKeyChecking=no -o ProxyCommand='ssh -i ${local.ssh_private_key_path} -o StrictHostKeyChecking=no -W %h:%p opc@${oci_core_instance.bastion.public_ip}' opc@${oci_core_instance.master[0].private_ip} 'sudo cat /tmp/elastic_password.txt'"
 }
 
 output "kibana_login" {
@@ -68,10 +68,9 @@ output "cluster_name" {
   value       = var.elasticsearch_cluster_name
 }
 
-output "generated_ssh_private_key" {
-  description = "Generated SSH private key (if no key was provided)"
-  value       = var.ssh_public_key == "" ? tls_private_key.ssh_key[0].private_key_pem : "Using provided SSH key"
-  sensitive   = true
+output "ssh_private_key_path" {
+  description = "Path to SSH private key (generated or provided)"
+  value       = local.ssh_private_key_path
 }
 
 output "next_steps" {
@@ -79,7 +78,7 @@ output "next_steps" {
   value       = <<-EOT
 
     ========================================
-    Elasticsearch Cluster Deployed Successfully!
+    Elasticsearch Cluster Deployed!
     ========================================
 
     Elasticsearch URL: http://${oci_load_balancer_load_balancer.elasticsearch_lb.ip_address_details[0].ip_address}:${var.elasticsearch_port}
@@ -87,7 +86,7 @@ output "next_steps" {
 
     Bastion Host:      ${oci_core_instance.bastion.public_ip}
 
-    🔐 AUTHENTICATION ENABLED:
+    AUTH ENABLED:
     - Username: elastic
     - Password: Run 'terraform output get_elasticsearch_password' to get the retrieval command
     - Use these credentials to log into Kibana and access Elasticsearch API
@@ -104,7 +103,7 @@ output "next_steps" {
        Login with username 'elastic' and the password from step 1
 
     4. SSH to bastion:
-       ssh -i ~/.ssh/elasticsearch_cluster_key.pem opc@${oci_core_instance.bastion.public_ip}
+       ssh -i ${local.ssh_private_key_path} opc@${oci_core_instance.bastion.public_ip}
 
     5. From bastion, SSH to any node:
        ssh opc@<node-private-ip>

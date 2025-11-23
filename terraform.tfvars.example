@@ -9,7 +9,7 @@ region           = "us-ashburn-1"
 compartment_ocid = "ocid1.compartment.oc1..aaaaaaaa..."
 
 # Elasticsearch Configuration
-elasticsearch_version      = "8"  # Choose "7" or "8"
+elasticsearch_version      = "8.15"  # Choose "7", "8", or specific version like "8.15", "7.17.0"
 elasticsearch_cluster_name = "oci-es-cluster"
 
 # OCI Object Storage for Snapshots (Optional)

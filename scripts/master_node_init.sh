@@ -106,7 +106,15 @@ EOF
 
 # Install Elasticsearch and Kibana with retry
 echo "Installing Elasticsearch and Kibana..."
-retry_command dnf install -y elasticsearch kibana
+if [[ "$${ELASTICSEARCH_VERSION}" =~ ^[0-9]+\.[0-9]+ ]]; then
+  # Specific version requested (e.g., "8.15" or "8.15.0")
+  echo "Installing Elasticsearch version $${ELASTICSEARCH_VERSION}..."
+  retry_command dnf install -y elasticsearch-$${ELASTICSEARCH_VERSION}* kibana-$${ELASTICSEARCH_VERSION}*
+else
+  # Major version only (e.g., "8" or "7")
+  echo "Installing latest Elasticsearch $${ELASTICSEARCH_VERSION}.x..."
+  retry_command dnf install -y elasticsearch kibana
+fi
 
 # Install repository-s3 plugin for snapshot support
 echo "Installing repository-s3 plugin for OCI Object Storage snapshots..."

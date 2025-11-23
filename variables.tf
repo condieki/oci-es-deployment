@@ -31,12 +31,12 @@ variable "compartment_ocid" {
 
 # Elasticsearch Configuration
 variable "elasticsearch_version" {
-  description = "Elasticsearch version to install (7 or 8)"
+  description = "Elasticsearch version to install (7, 8, or specific version like 8.15)"
   type        = string
   default     = "8"
   validation {
-    condition     = contains(["7", "8"], var.elasticsearch_version)
-    error_message = "Elasticsearch version must be either 7 or 8"
+    condition     = can(regex("^(7|8)(\\.\\d+)?(\\.\\d+)?$", var.elasticsearch_version))
+    error_message = "Elasticsearch version must be 7, 8, or a specific version like 7.17, 8.15, 8.15.0"
   }
 }
 

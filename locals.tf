@@ -5,7 +5,7 @@ locals {
   is_flexible_lb_shape      = var.lb_shape == "flexible"
 
   elasticsearch_major_version = var.elasticsearch_version
-  elastic_repo_version = var.elasticsearch_version == "8" ? "8.x" : "7.x"
+  elastic_repo_version = startswith(var.elasticsearch_version, "8") ? "8.x" : "7.x"
 
   master_heap_size_gb = min(floor(var.master_node_memory_gb / 2), 31)
   data_heap_size_gb   = min(floor(var.data_node_memory_gb / 2), 31)

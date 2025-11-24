@@ -121,6 +121,11 @@ echo "Installing repository-s3 plugin for OCI Object Storage snapshots..."
 /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch repository-s3
 echo "Repository-s3 plugin installed successfully"
 
+# Install mapper-size plugin (available in both 7.x and 8.x)
+echo "Installing mapper-size plugin..."
+/usr/share/elasticsearch/bin/elasticsearch-plugin install --batch mapper-size
+echo "Mapper-size plugin installed successfully"
+
 # Create data directories
 echo "Creating data directories..."
 mkdir -p /elasticsearch/data /elasticsearch/logs
